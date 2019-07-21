@@ -1,4 +1,0 @@
-$font-size:20;
-@function px2rem($i) {
-	@return $i / $font-size + rem;
-}

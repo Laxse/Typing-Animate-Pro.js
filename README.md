@@ -1,31 +1,37 @@
-# Typing-Animate.js
+# Typing-Animate-Pro.js
 
-##打字动画插件(需JQuery支持)
-
+##打字动画插件
+## 改进特性
+ - 不依赖Jquery
+ - 增加闭包
+ - 增加换行功能
+##TODO
+ - 增加图片输入
+ - 增加内置特效
 ###文件下载
+    根目录下Typing-Animate-Pro.js
 
-在本仓库的/dist/js路径下。
+### 一、新增功能使用方法
 
-###预览和简单介绍
+1.换行功能
+```javascript
+type.add("这是一句测试的效果") 
+    .sleep(1000) 
+    .br()
+    .add("第二行")
+```
 
-[点击这里](http://www.one-story.cn/typing-animate.html)
-
-###一、快速使用方法
-
-0.在最开始的开始，先将jJQuery.js和typing-animate.js文件引入
-
+#### 基本用法参见[typing-animate.js](https://github.com/Dieber/typing-animate.js)
 ```html
-<script src="./dist/js/jquery.min.js"></script>
-<script src="./dist/js/typing-animate-min.js"></script>
+<script src="./Typing-Animate-Pro.js"></script>
 
 ```
 
 1.然后指定一个要实现动画效果的空标签内增加一个类名,这里我们设为typing-ani。
 
 ```html
- <div class="typing-ani" id="title"></div>
+ <div class="typing-ani" ></div>
 ```
-
 2.使用内置的构造函数新建一个对象，第一个参数为类名，第二个参数为对动画的配置选项（不传则为默认动画效果）
 
 ```javascript
