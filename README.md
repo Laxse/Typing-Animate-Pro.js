@@ -5,7 +5,7 @@
  - 不依赖Jquery
  - 增加闭包
  - 增加换行功能
- 
+ - 删除增加模式【ALL 删除所有 // LINE 删除到<`br`> //NUM 删除指定数量 // DIFF 删除到非文本位置「包括<`br`>」（后续会用到）】
 ## TODO
  - 增加图片输入
  - 增加内置特效
@@ -17,10 +17,23 @@
 
 1.换行功能
 ```javascript
-type.add("这是一句测试的效果") 
-    .sleep(1000) 
-    .br()
-    .add("第二行")
+type.add("这是一句测试的效果").sleep(1000).br().add("第二行").execute();   
+```
+2.删除功能
+```javascript
+    /**
+     *     不传 -> 删除所有
+     *     数值 按数量删除
+     *     {
+     *      mode : "LINE","ALL","DIFF","NUM",
+     *      num : 10
+     *      } 
+     */
+    .delete()
+    .delete(10)
+    .delete({mode : "LINE"})
+    .delete({mode : "NUM",num: 10})
+
 ```
 
 #### 基本用法参见[typing-animate.js](https://github.com/Dieber/typing-animate.js)

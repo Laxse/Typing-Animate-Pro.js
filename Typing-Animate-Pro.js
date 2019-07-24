@@ -147,28 +147,62 @@
             This.execute();
         }, this.typingSpeed);
     }
+    /**
+     * val 不传 -> 删除所有
+     *     数值 按数量删除
+     *     {
+     *      mode : "LINE","ALL","DIFF","NUM",
+     *      num : 10
+     *      } 
+     */
     Typing.prototype.deleteTask = function (val) {
+        if(!val){
+            val={};val.mode = ALL_MODE;
+        }else if(typeof(val) == "number"){
+            var t = val;
+            val={};
+            val.mode = LINE_MODE;
+            val.num = t;
+        }else if(!val.num){
+            val.num = 0;
+        }
         var This = this;
-        if(val.mode == ALL_MODE){
+        var allChildCount = This.el.querySelector("." + CONTAINER_CLASS).children.length;
+        if(!val || val.mode == ALL_MODE){
             var count = 0;
-            var allCharLength = $("." + This.className + " .typing-container")[0].children.length;
-            if (!val == true) {
-                val = allCharLength;
-            }
-            
             var charInterval = setInterval(function () {
-                $("." + This.className + " .typing-container span:nth-last-child(1)").remove();
-                count++;
-                if (count == val) {
+                if (count == allChildCount) {
                     clearInterval(charInterval);
                     This.execute();
+                }else{
+                    var lastChild = This.el.querySelector("." + CONTAINER_CLASS).lastChild;
+                    lastChild.remove();
+                    count++;
                 }
             }, this.typingSpeed);
         }else if(val.mode == LINE_MODE){
-            var allCharLength = This.el.querySelector("." + CONTAINER_CLASS).children.length;
-            if (!val == true) {
-                val = allCharLength;
-            }
+            var charInterval = setInterval(function () {
+                var lastChild = This.el.querySelector("." + CONTAINER_CLASS).lastChild;
+                if (lastChild.nodeName == "BR" || (lastChild.nodeName == "SPAN" && lastChild.className == HEAD_CLASS)) {
+                    clearInterval(charInterval);
+                    This.execute();
+                } else {
+                    lastChild.remove();
+                }
+            }, this.typingSpeed);
+        }else if(val.mode ==  NUM_MODE){
+            var count = 0;
+            var charInterval = setInterval(function () {
+                if (count==val.num ||count==allChildCount) {
+                    clearInterval(charInterval);
+                    This.execute();
+                } else {
+                    var lastChild = This.el.querySelector("." + CONTAINER_CLASS).lastChild;
+                    lastChild.remove();
+                    count++;
+                }
+            }, this.typingSpeed);
+        }else if(val.mode == DIFF_MODE){
             var charInterval = setInterval(function () {
                 var lastChild = This.el.querySelector("." + CONTAINER_CLASS).lastChild;
                 if (lastChild.nodeName != "SPAN" || (lastChild.nodeName == "SPAN" && lastChild.className == HEAD_CLASS)) {
@@ -178,13 +212,7 @@
                     lastChild.remove();
                 }
             }, this.typingSpeed);
-        }else if(val.mode ==  NUM_MODE){
-
-        }else if(val.mode == DIFF_MODE){
-
         }
-        
-        
     }
 
     Typing.prototype.sleepTask = function (val) {
@@ -218,5 +246,4 @@
         }
         parent.appendChild(frag);
     }
-
 })();
