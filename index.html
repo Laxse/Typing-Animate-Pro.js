@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./Typing-Animate-Pro.js"></script>
+</head>
+<body>
+    <div class="type"></div>
+    <script>
+     var typing = new Typing("type",{
+        "typingSpeed":50,  //打字速度，数值为时间间隔（ms）
+        "cursorSpeed":100, //光标闪烁速度，数值为时间间隔（ms）
+        "head":"/* ",      //头部固定文字
+        "foot":" */"       //尾部固定文字
+        });
+        //typing.add("这是一句测试的效果").sleep(1000).br(true).add("第二行").delete().execute();   
+        typing.add("这是一句测试的效果").add("第二行").execute();   
+    </script>
+</body>
+</html>

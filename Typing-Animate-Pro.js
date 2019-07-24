@@ -1,6 +1,5 @@
 (function () {
     'use strict';
-
     function Typing(className, object) {
         this.stringName = "";
         this.typingSpeed = 50;
@@ -53,9 +52,9 @@
         });
         return this;
     }
-    Typing.prototype.br = function () {
+    Typing.prototype.br = function (bool) {
         this.taskQueue.push({
-            "br": true
+            "br": bool
         });
         return this;
     }
@@ -104,7 +103,7 @@
                 } else if (name == "sleep") {
                     this.sleepTask(a[name]);
                 } else if(name == "br"){
-                    this.addBr();
+                    this.addBr(a[name]);
                 } else if (name == "setting") {
                     this.settingTask(a[name]);
                 } else if (name == "callback") {
@@ -138,32 +137,33 @@
     }
     Typing.prototype.addBr = function (val) {
         var This = this;
+        var brScript = "<span><br></span>";
+        if(val){
+            brScript = "<span class='typing-foot'>" + This.foot + "</span>"+"<br>"+"<span class='typing-head'>" + This.head + "</span>";
+        }
         var charInterval = setInterval(function () {
-            typeAppend(This.el.querySelector(".typing-container"), "<span><br></span>");
+            typeAppend(This.el.querySelector(".typing-container"), brScript);
             clearInterval(charInterval);
             This.execute();
         }, this.typingSpeed);
     }
     Typing.prototype.deleteTask = function (val) {
         var This = this;
-        var count = 0;
         var show = true;
         var allCharLength = This.el.querySelector(".typing-container").children.length;
         if (!val == true) {
             val = allCharLength;
         }
-        if (val > allCharLength) {
-            console.error("The delete function's param must less than String's length");
-        } else {
-            var charInterval = setInterval(function () {
-                typeRemove(This.el.querySelector(" .typing-container").lastChild);
-                count++;
-                if (count == val) {
-                    clearInterval(charInterval);
-                    This.execute();
-                }
-            }, this.typingSpeed);
-        }
+        var charInterval = setInterval(function () {
+            var lastChild = This.el.querySelector(" .typing-container").lastChild;
+            if (lastChild.nodeName != "SPAN" || (lastChild.nodeName == "SPAN"&& lastChild.className == "typing-head")) {
+                clearInterval(charInterval);
+                This.execute();
+            }else{
+                typeRemove(lastChild);
+            }
+        }, this.typingSpeed);
+        
     }
     Typing.prototype.sleepTask = function (val) {
         var This = this;
@@ -178,10 +178,14 @@
         }
         this.execute();
     };
+    /**
+     * 增加后续主节点
+     */
     Typing.prototype.addNext = function(val){
         var This = this;
         This.el.insertAdjacentHTML('afterend',  '<div class="'+val+'"></div>')
     }
+    //原生append
     function typeAppend(parent, text) {
         if (typeof text === 'string') {
             var temp = document.createElement('div');
@@ -196,7 +200,7 @@
             parent.appendChild(text);
         }
     }
-
+    //原生remove
     function typeRemove(selectors) {
         selectors.removeNode = [];
         if (selectors.length != undefined) {
