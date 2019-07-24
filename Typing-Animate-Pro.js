@@ -1,5 +1,7 @@
 (function () {
     'use strict';
+    var HEAD_CLASS = "T_A_P_HEAD", CONTAINER_CLASS = "T_A_P_MAIN", FOOT_CLASS = "T_A_P_FOOT", CURSOR_CLASS = "T_A_P_CURSOR";
+    var ALL_MODE = "ALL",LINE_MODE = "LINE",NUM_MODE = "NUM",DIFF_MODE = "DIFF"; //所有内容 // 当前行 // 指定数量 // 直到非文本（待定）
     function Typing(className, object) {
         this.stringName = "";
         this.typingSpeed = 50;
@@ -19,27 +21,27 @@
         }
         this.init();
     }
-    window['Typing'] = Typing;
+    window['Typing'] = Typing;//如有需要，修改，防止冲突
     Typing.prototype.init = function () {
         if (!!this.head) {
-            typeAppend(this.el, "<span class='typing-head'>" + this.head + "</span>");
+            typeAppend(this.el, "<span class='" + HEAD_CLASS + "'>" + this.head + "</span>");
         }
-        typeAppend(this.el, "<span class='typing-container'></span>");
-        typeAppend(this.el, "<span class='cursor'>" + this.cursorChar + "</span>");
+        typeAppend(this.el, "<span class='" + CONTAINER_CLASS + "'></span>");
+        typeAppend(this.el, "<span class='" + CURSOR_CLASS + "'>" + this.cursorChar + "</span>");
         if (!!this.foot) {
-            typeAppend(this.el, "<span class='typing-foot'>" + this.foot + "</span>");
+            typeAppend(this.el, "<span class='" + FOOT_CLASS + "'>" + this.foot + "</span>");
         }
         if (this.el.fade == true) {
-            document.querySelector(".cursor").style.transition = "opacity " + this.cursorSpeed / 2000 + "s";
+            document.querySelector("." + CURSOR_CLASS).style.transition = "opacity " + this.cursorSpeed / 2000 + "s";
         }
         var show = true;
         var This = this;
         this.cursorInterval = setInterval(function () {
             if (show) {
-                This.el.querySelector(" .cursor").style.opacity = 1;
+                This.el.querySelector("." + CURSOR_CLASS).style.opacity = 1;
                 show = false;
             } else {
-                This.el.querySelector(" .cursor").style.opacity = 0;
+                This.el.querySelector("." + CURSOR_CLASS).style.opacity = 0;
                 show = true;
             }
         }, this.cursorSpeed);
@@ -58,9 +60,9 @@
         });
         return this;
     }
-    Typing.prototype.delete = function (number) {
+    Typing.prototype.delete = function (obj) {
         this.taskQueue.push({
-            "delete": number
+            "delete": obj
         });
         return this;
     }
@@ -86,8 +88,6 @@
         return this;
     };
 
-
-
     Typing.prototype.execute = function () {
 
         if (!!this.taskQueue[0] == true) {
@@ -102,7 +102,7 @@
                     this.deleteTask(a[name]);
                 } else if (name == "sleep") {
                     this.sleepTask(a[name]);
-                } else if(name == "br"){
+                } else if (name == "br") {
                     this.addBr(a[name]);
                 } else if (name == "setting") {
                     this.settingTask(a[name]);
@@ -113,7 +113,7 @@
             }
         } else {
             if (this.cursorInfinity == false) {
-                typeRemove(this.el.querySelector(".cursor"));
+                this.el.querySelector("." + CURSOR_CLASS).remove();
                 clearInterval(this.cursorInterval);
             } else {
                 console.log('??');
@@ -127,7 +127,7 @@
         var count = 0;
         var length = this.stringName.length;
         var charInterval = setInterval(function () {
-            typeAppend(This.el.querySelector(".typing-container"), "<span>" + This.stringName.charAt(count) + "</span>");
+            typeAppend(This.el.querySelector("." + CONTAINER_CLASS), "<span>" + This.stringName.charAt(count) + "</span>");
             count++;
             if (count == length) {
                 clearInterval(charInterval);
@@ -138,33 +138,55 @@
     Typing.prototype.addBr = function (val) {
         var This = this;
         var brScript = "<span><br></span>";
-        if(val){
-            brScript = "<span class='typing-foot'>" + This.foot + "</span>"+"<br>"+"<span class='typing-head'>" + This.head + "</span>";
+        if (val) {
+            brScript = "<span class='" + FOOT_CLASS + "'>" + This.foot + "</span>" + "<br>" + "<span class='" + HEAD_CLASS + "'>" + This.head + "</span>";
         }
         var charInterval = setInterval(function () {
-            typeAppend(This.el.querySelector(".typing-container"), brScript);
+            typeAppend(This.el.querySelector("." + CONTAINER_CLASS), brScript);
             clearInterval(charInterval);
             This.execute();
         }, this.typingSpeed);
     }
     Typing.prototype.deleteTask = function (val) {
         var This = this;
-        var show = true;
-        var allCharLength = This.el.querySelector(".typing-container").children.length;
-        if (!val == true) {
-            val = allCharLength;
-        }
-        var charInterval = setInterval(function () {
-            var lastChild = This.el.querySelector(" .typing-container").lastChild;
-            if (lastChild.nodeName != "SPAN" || (lastChild.nodeName == "SPAN"&& lastChild.className == "typing-head")) {
-                clearInterval(charInterval);
-                This.execute();
-            }else{
-                typeRemove(lastChild);
+        if(val.mode == ALL_MODE){
+            var count = 0;
+            var allCharLength = $("." + This.className + " .typing-container")[0].children.length;
+            if (!val == true) {
+                val = allCharLength;
             }
-        }, this.typingSpeed);
+            
+            var charInterval = setInterval(function () {
+                $("." + This.className + " .typing-container span:nth-last-child(1)").remove();
+                count++;
+                if (count == val) {
+                    clearInterval(charInterval);
+                    This.execute();
+                }
+            }, this.typingSpeed);
+        }else if(val.mode == LINE_MODE){
+            var allCharLength = This.el.querySelector("." + CONTAINER_CLASS).children.length;
+            if (!val == true) {
+                val = allCharLength;
+            }
+            var charInterval = setInterval(function () {
+                var lastChild = This.el.querySelector("." + CONTAINER_CLASS).lastChild;
+                if (lastChild.nodeName != "SPAN" || (lastChild.nodeName == "SPAN" && lastChild.className == HEAD_CLASS)) {
+                    clearInterval(charInterval);
+                    This.execute();
+                } else {
+                    lastChild.remove();
+                }
+            }, this.typingSpeed);
+        }else if(val.mode ==  NUM_MODE){
+
+        }else if(val.mode == DIFF_MODE){
+
+        }
+        
         
     }
+
     Typing.prototype.sleepTask = function (val) {
         var This = this;
         setTimeout(function () {
@@ -181,46 +203,20 @@
     /**
      * 增加后续主节点
      */
-    Typing.prototype.addNext = function(val){
+    Typing.prototype.addNextTyping = function (val) {
         var This = this;
-        This.el.insertAdjacentHTML('afterend',  '<div class="'+val+'"></div>')
+        This.el.insertAdjacentHTML('afterend', '<div class="' + val + '"></div>')
     }
     //原生append
     function typeAppend(parent, text) {
-        if (typeof text === 'string') {
-            var temp = document.createElement('div');
-            temp.innerHTML = text;
-            // 防止元素太多 进行提速
-            var frag = document.createDocumentFragment();
-            while (temp.firstChild) {
-                frag.appendChild(temp.firstChild);
-            }
-            parent.appendChild(frag);
-        } else {
-            parent.appendChild(text);
+        var temp = document.createElement('div');
+        temp.innerHTML = text;
+        // 防止元素太多 进行提速
+        var frag = document.createDocumentFragment();
+        while (temp.firstChild) {
+            frag.appendChild(temp.firstChild);
         }
+        parent.appendChild(frag);
     }
-    //原生remove
-    function typeRemove(selectors) {
-        selectors.removeNode = [];
-        if (selectors.length != undefined) {
-            var len = selectors.length;
-            for (var i = 0; i < len; i++) {
-                selectors.removeNode.push({
-                    parent: selectors[i].parentNode,
-                    inner: selectors[i].outerHTML,
-                    next: selectors[i].nextSibling
-                });
-            }
-            for (var i = 0; i < len; i++)
-                selectors[0].parentNode.removeChild(selectors[0]);
-        } else {
-            selectors.removeNode.push({
-                parent: selectors.parentNode,
-                inner: selectors.outerHTML,
-                next: selectors.nextSibling
-            });
-            selectors.parentNode.removeChild(selectors);
-        }
-    }
+
 })();
